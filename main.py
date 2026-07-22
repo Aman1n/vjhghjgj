@@ -9,5 +9,8 @@ class User(BaseModel):
 
 @app.post("/create-user")
 def create_user(user: User):
+    """
+    Creates a new user.
+    """
     return {'MESSAGE': 'User created successfully', 'user': user}
 
