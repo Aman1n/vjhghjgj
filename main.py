@@ -3,30 +3,25 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
-# class User(BaseModel):
-#     username: str
-#     age: int
-#     email: str
+todos = []
 
-# @app.post("/create-user")
-# def create_user(user: User):
-#     return {'MESSAGE': 'User created successfully',
-#              'user': user}
+class Todo(BaseModel):
+    id: int
+    title: str
+    completed: bool
 
-class address(BaseModel):
-    street: str
-    city: str
-    state: str
-    pincode: int
+@app.post("/todos")
+def create_todos(todo:Todo):
+    todos.append(todo)
+    return {"message": "Todo created successfully", "todo": todo}
 
-class User(BaseModel):
-    username: str
-    age: int
-    email: str
-    address: address
+@app.get("/todos")
+def get_todos():
+    return {"todos": todos}
 
-@app.post("/create-user-with-address")
-def create_user_with_address(user: User):
-    return {'MESSAGE': 'User with address created successfully',
-             'user': user}
-
+@app.get("/todos/{todo_id}")
+def get_todo(todo_id: int):
+    for todo in todos:
+        if todo.id == todo_id:
+            return {"todo": todo}
+    return {"message": "Todo not found"}
