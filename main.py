@@ -3,41 +3,20 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
-todos = []
+users = []
 
-class Todo(BaseModel):
-    id: int
-    title: str
-    completed: bool
+class User(BaseModel):
+    username: str
+    age: int
 
-@app.post("/todos")
-def create_todos(todo:Todo):
-    todos.append(todo)
-    return {"message": "Todo created successfully", "todo": todo}
+@app.post("/users")
+def create_user(user: User):
+    users.append(user)
+    return {"message": "User created successfully", "user": user}
 
-@app.get("/todos")
-def get_todos():
-    return {"todos": todos}
-
-@app.get("/todos/{todo_id}")
-def get_todo(todo_id: int):
-    for todo in todos:
-        if todo.id == todo_id:
-            return {"todo": todo}
-    return {"message": "Todo not found"}
-
-@app.put("/todos/{todo_id}")
-def update_todo(todo_id: int ,update_todo: Todo):
-    for index, todo in enumerate(todos):
-        if todo.id == todo_id:
-            todos[index] = update_todo
-            return {"message": "Todo updated successfully", "todo": update_todo}
-    return {"message": "Todo not found"}
-
-@app.delete("/todos/{todo_id}")
-def delete_todo(todo_id: int):
-    for index, todo in enumerate(todos):
-        if todo.id == todo_id:
-            todos.pop(index)
-            return {"message": "Todo deleted successfully"}
-    return {"message": "Todo not found"}
+@app.put("/users/{user_id}")
+def update_user(user_id: int, user: User,notice: bool = False):
+    if user_id < 0 or user_id >= len(users):
+        return {"error": "User not found"}
+    users[user_id] = user
+    return {"message": "User updated successfully", "user": user}
