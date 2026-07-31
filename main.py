@@ -1,28 +1,40 @@
-from fastapi import FastAPI,status,HTTPException,Request
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, Depends,Header,HTTPException
+
 
 app = FastAPI()
 
-class Usernotfound(Exception):
-    def __init__(self, name: str):
-        self.name = name
+def verify_token(token: str = Header(None)):
+    if token != "mysecrettoken":
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    return {
+        "user":"Authenticated User"
+    }
 
-@app.exception_handler(Usernotfound)
-def user_not_found_exception_handler(request: Request, exc: Usernotfound):
-            return JSONResponse(
-                status_code=404,
-                content={"status":"error","message":f"User not found {exc.name}"})
+@app.get("/secure-data")
+def secure_data(user = Depends(verify_token)):
+    return {
+        "message": "This is a secure data response",
+        "user": user
+    }
 
-@app.get("/user/{name}")
-def get_user(name: str):
-    if name !="Aman":
-        raise Usernotfound(name)
-    return {"name": name}
+# def common_logic():
+#     return{
+#         "message": "This is a common logic response"
+#     }
 
+# @app.get("/home")
+# def home(data = Depends(common_logic)):
+#     return data
 
-    
-# @app.get("/users/{user_id}")
-# def get_user(user_id: int):
-#     if user_id != 1:
-#         raise HTTPException(status_code=404, detail="Invalid user ID")
-#     return {"user_id": 1, "name": "John Doe"}
+# def get_current_user():
+#     return {
+#         "username": "Aman",
+#     }
+
+# @app.get("/profile")
+# def profile(user = Depends(get_current_user)):
+#     return user
+
+# @app.get("/dashboard")
+# def dashboard(user = Depends(get_current_user)):
+#     return user
