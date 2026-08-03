@@ -1,40 +1,21 @@
-from fastapi import FastAPI, Depends,Header,HTTPException
-
-
+from fastapi import FastAPI, Request
+import time
 app = FastAPI()
 
-def verify_token(token: str = Header(None)):
-    if token != "mysecrettoken":
-        raise HTTPException(status_code=401, detail="Unauthorized")
-    return {
-        "user":"Authenticated User"
-    }
+@app.middleware("http")
+async def my_middleware(request: Request, call_next):
+    start_time = time.time()
 
-@app.get("/secure-data")
-def secure_data(user = Depends(verify_token)):
-    return {
-        "message": "This is a secure data response",
-        "user": user
-    }
+    response = await call_next(request)
+    process_time = time.time() - start_time
 
-# def common_logic():
-#     return{
-#         "message": "This is a common logic response"
-#     }
+    print(f"PAth: {request.url.path} | Time: {process_time}")
+    return response
 
-# @app.get("/home")
-# def home(data = Depends(common_logic)):
-#     return data
+# async def my_middleware(request: Request, call_next):
+#     print("Before request ")
 
-# def get_current_user():
-#     return {
-#         "username": "Aman",
-#     }
+#     response = await call_next(request)
+#     print("After request ") 
+#     return response
 
-# @app.get("/profile")
-# def profile(user = Depends(get_current_user)):
-#     return user
-
-# @app.get("/dashboard")
-# def dashboard(user = Depends(get_current_user)):
-#     return user
