@@ -1,21 +1,16 @@
-from fastapi import FastAPI, Request
-import time
+import sqlite3
+from fastapi import FastAPI
+
 app = FastAPI()
 
-@app.middleware("http")
-async def my_middleware(request: Request, call_next):
-    start_time = time.time()
+conn = sqlite3.connect('example.db',check_same_thread=False)
+cursor = conn.cursor()
 
-    response = await call_next(request)
-    process_time = time.time() - start_time
+cursor.execute('''CREATE TABLE IF NOT EXISTS users
+                 (id INTEGER PRIMARY KEY , name TEXT, email TEXT)''')
 
-    print(f"PAth: {request.url.path} | Time: {process_time}")
-    return response
+conn.commit()
 
-# async def my_middleware(request: Request, call_next):
-#     print("Before request ")
-
-#     response = await call_next(request)
-#     print("After request ") 
-#     return response
-
+@app.get("/")
+def home():
+    return {"message": "Welcome to the FastAPI application!"}   
