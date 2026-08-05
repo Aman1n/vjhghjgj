@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base,Session
 from sqlalchemy import Column, Integer, String
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 
 app= FastAPI()
 
@@ -31,10 +31,30 @@ def get_db():
     finally:
         db.close()
 
+# Create Data
 @app.post("/todos")
 def create_todo(title:str,db: Session = Depends(get_db)):
     todo = Todo(title=title, completed="false")
     db.add(todo)
     db.commit()
     db.refresh(todo)
+    return todo
+
+
+# Read All Data
+
+@app.get("/todos")
+def get_todos(db: Session = Depends(get_db)):
+    todos = db.query(Todo).all()
+    return{
+        "Total": len(todos),
+        "data": todos
+    }
+
+# Read Single Data
+@app.get("/todos/{todo_id}")
+def get_todo(todo_id:int, db: Session = Depends(get_db)):
+    todo = db.query(Todo).filter(Todo.id == todo_id).first()
+    if not todo:
+        raise HTTPException(status_code=404, detail="Todo not found")
     return todo
