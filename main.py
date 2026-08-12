@@ -38,4 +38,4 @@ def get_file(filename: str):
 
 @app.get("/")
 def home():
-    return {"message": "Welcome to the File Upload API. Use /upload to upload files and /files/{filename} to access them."}
+    return {"message": "Welcome to the File Upload API. Use  to access them."}
