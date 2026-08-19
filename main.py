@@ -1,41 +1,19 @@
-from fastapi import FastAPI, UploadFile,File,HTTPException
-from fastapi.staticfiles import StaticFiles
-import os
-import shutil
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI()             
+app = FastAPI()
 
-UPLOAD_DIR = "uploads"
-if not os.path.exists(UPLOAD_DIR):
-    os.makedirs(UPLOAD_DIR)
+origin = [
+    "http://localhost:5173"]
 
-app.mount("/files", StaticFiles(directory=UPLOAD_DIR), name="files")
-
-@app.post("/upload")
-def upload_file(file: UploadFile = File(... )):
-    filename = file.filename
-    file_path = os.path.join(UPLOAD_DIR, filename)
-
-    if not filename:
-        raise HTTPException(status_code=400, detail="No file uploaded")
-
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-
-    return { "Meassage ": "FIle upload successfully",
-        "filename": filename,
-        "file_url": f"http://127.0.0.1:8000/files/{filename}"}
-
-@app.get("/files/{filename}")
-def get_file(filename: str):
-    file_path = os.path.join(UPLOAD_DIR, filename)
-
-    if not os.path.exists(file_path):
-        raise HTTPException(status_code=404, detail="File not found")
-
-    return {
-        "file_url": f"http://127.0.0.1:8000/files/{filename}"}
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origin,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
 @app.get("/")
-def home():
-    return {"message": "Welcome to the File Upload API. Use  to access them."}
+def root():
+    return {"message": "Api is working"}
