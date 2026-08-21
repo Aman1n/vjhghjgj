@@ -1,10 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from config import setting
+
 
 app = FastAPI()
 
-origin = [
-    "http://localhost:5173"]
+origin = setting.ORIGIN
+
 
 app.add_middleware(
     CORSMiddleware,
