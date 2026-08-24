@@ -1,21 +1,11 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from config import setting
-
 
 app = FastAPI()
 
-origin = setting.ORIGIN
-
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origin,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"]
-)
-
 @app.get("/")
-def root():
-    return {"message": "Api is working"}
+def home():
+    return {"message": "Hello, World!"}
+
+@app.get("/add")
+def add_numbers(a: int, b: int):
+    return {"result": a + b}
